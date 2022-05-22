@@ -1,4 +1,4 @@
-const { Thought, Reaction } = require("../models");
+const { Thought, User } = require("../models");
 
 module.exports = {
   //get a thought
@@ -16,12 +16,6 @@ module.exports = {
           ? res.status(404).json({ message: "No thought with that id" })
           : res.json(thought)
       )
-      .catch((err) => res.status(500).json(err));
-  },
-  //create a thought
-  createThought(req, res) {
-    Thought.create(req.body)
-      .then((thought) => res.json(thought))
       .catch((err) => res.status(500).json(err));
   },
   // Delete a thought and remove them from the user
