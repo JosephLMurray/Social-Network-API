@@ -1,4 +1,4 @@
-const { Thought, User } = require("../models");
+const { Thought, User, Reaction } = require("../models");
 
 module.exports = {
   //get a thought
@@ -62,24 +62,27 @@ module.exports = {
   addReaction(req, res) {
     console.log("You are adding a reaction");
     console.log(req.body);
-    Thought.findOneAndUpdate(
-      { _id: req.params.thoughtId },
-      { $addToSet: { reactions: req.body } }
-    )
-      .then((thought) =>
-        !thought
-          ? res
-              .status(404)
-              .json({ message: "No thought found with that ID :(" })
-          : res.json(thought)
+    Reaction.create(req.body).then((reaction) =>
+      Thought.findOneAndUpdate(
+        { _id: req.params.thoughtId },
+        { $addToSet: { reactions: reaction._id } }
       )
-      .catch((err) => res.status(500).json(err));
+        .then((thought) =>
+          !thought
+            ? res
+                .status(404)
+                .json({ message: "No thought found with that ID :(" })
+            : res.json(thought)
+        )
+        .catch((err) => res.status(500).json(err))
+    );
   },
   // Remove reaction from a thought
   removeReaction(req, res) {
     Thought.findOneAndUpdate(
       { _id: req.params.thoughtId },
-      { $pull: { reactions: { reactionId: req.params.reactionId } } }
+      { $pull: { reactions: req.params.reactionId } },
+      { new: true }
     )
       .then((thought) =>
         !thought
@@ -90,18 +93,18 @@ module.exports = {
   },
   // Add a thought to a user
   addThought(req, res) {
-    console.log("You are adding a Thought");
-    console.log(req.body);
-    User.findOneAndUpdate(
-      { _id: req.params.userId },
-      { $addToSet: { thoughts: req.body } },
-      { runValidators: true, new: true }
-    )
-      .then((user) =>
-        !user
-          ? res.status(404).json({ message: "No user found with that ID" })
-          : res.json(user)
+    Thought.create(req.body).then((thought) =>
+      User.findOneAndUpdate(
+        { username: thought.username },
+        { $addToSet: { thoughts: thought._id } },
+        { new: true }
       )
-      .catch((err) => res.status(500).json(err));
+        .then((user) =>
+          !user
+            ? res.status(404).json({ message: "No user found with that ID" })
+            : res.json([thought, user])
+        )
+        .catch((err) => res.status(500).json(err))
+    );
   },
 };
