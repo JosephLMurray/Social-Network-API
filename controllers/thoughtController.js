@@ -60,8 +60,6 @@ module.exports = {
 
   // Add an reaction to a thought
   addReaction(req, res) {
-    console.log("You are adding a reaction");
-    console.log(req.body);
     Reaction.create(req.body).then((reaction) =>
       Thought.findOneAndUpdate(
         { _id: req.params.thoughtId },
