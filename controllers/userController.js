@@ -21,7 +21,7 @@ module.exports = {
       )
       .catch((err) => res.status(500).json(err));
   },
-  // create a new student
+  // create a new user
   createUser(req, res) {
     User.create(req.body)
       .then((user) => res.json(user))
