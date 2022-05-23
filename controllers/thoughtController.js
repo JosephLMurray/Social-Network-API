@@ -77,16 +77,20 @@ module.exports = {
   },
   // Remove reaction from a thought
   removeReaction(req, res) {
-    Thought.findOneAndUpdate(
-      { _id: req.params.thoughtId },
-      { $pull: { reactions: req.params.reactionId } }
-    )
-      .then((thought) =>
-        !thought
-          ? res.status(404).json({ message: "No thought found with that ID " })
-          : res.json(thought)
+    Reaction.findOneAndDelete({ _id: req.params.reactionId }).then((reaction) =>
+      Thought.findOneAndUpdate(
+        { _id: req.params.thoughtId },
+        { $pull: { reactions: req.params.reactionId } }
       )
-      .catch((err) => res.status(500).json(err));
+        .then((thought) =>
+          !thought
+            ? res
+                .status(404)
+                .json({ message: "No thought found with that ID " })
+            : res.json(thought)
+        )
+        .catch((err) => res.status(500).json(err))
+    );
   },
   // Add a thought to a user
   addThought(req, res) {
