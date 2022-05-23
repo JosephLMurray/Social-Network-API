@@ -24,7 +24,7 @@ const thoughtSchema = new Schema(
     reactions: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Reaction",
+        ref: "reaction",
       },
     ],
   },
